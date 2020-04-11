@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:splashscreen/splashscreen.dart';
+import 'utils/database_helper.dart';
+import 'model/lang.dart';
 
-void main() {
+List myLang;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var db = new DatabaseHelper();
+
+  myLang = await db.getAllUsers();
+  for (int i = 0; i < myLang.length; i++) {
+    Lang lang = Lang.map(myLang[i]);
+    print(
+        'ID: ${lang.id} - lang: ${lang.lang} - description: ${lang.description}');
+  }
   runApp(new MaterialApp(
     debugShowCheckedModeBanner: false,
     home: new MyApp(),
@@ -19,7 +31,10 @@ class _MyAppState extends State<MyApp> {
     return new SplashScreen(
       title: new Text(
         'Welcome In SplashScreen',
-        style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0,color: Colors.green,
+        style: new TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20.0,
+          color: Colors.green,
         ),
       ),
       seconds: 3,
@@ -39,17 +54,26 @@ class AfterSplash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        backgroundColor: Colors.blue,
-        title: new Text("Welcome In Programming App"),
-        automaticallyImplyLeading: true,
+      appBar: AppBar(
+        title: new Text('SQLITE'),
+        backgroundColor: Colors.blueAccent,
       ),
-      body: new Center(
-        child: new Text(
-          "Succeeded!",
-          style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 30.0),
-        ),
-      ),
+      body: new ListView.builder(
+          itemCount: myLang.length,
+          itemBuilder: (_, int position) {
+            return new Card(
+              child: new ListTile(
+                leading: new Icon(Icons.accessibility,
+                    color: Colors.red, size: 33.0),
+                title: new Text('${Lang.fromMap(myLang[position]).lang}'),
+                subtitle:
+                    new Text('${Lang.fromMap(myLang[position]).description}'),
+                onTap: () => debugPrint('ontap'),
+              ),
+              color: Colors.amber,
+              elevation: 3.0,
+            );
+          }),
     );
   }
 }
